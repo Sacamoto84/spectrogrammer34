@@ -398,6 +398,7 @@ extern "C" JNIEXPORT int JNICALL Java_com_example_spectrogrammer34_Spectrogram_G
 extern "C" JNIEXPORT void JNICALL Java_com_example_spectrogrammer34_Spectrogram_ConnectWithAudioMT(JNIEnv * env, jclass obj)
 {
     LOGE("chunker.begin();");
+
     chunker.begin();
 
     SetRecorderCallback([](void* pCTX, uint32_t msg, void* pData) ->bool

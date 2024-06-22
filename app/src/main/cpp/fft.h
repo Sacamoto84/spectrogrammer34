@@ -84,7 +84,11 @@ public:
         init(length);
     }
 
-    int getProcessedLength() const { return m_length; }
+    /**
+     * Прочесть длину данных 4096
+     * @return
+     */
+    [[nodiscard]] int getProcessedLength() const { return m_length; }
 
     [[nodiscard]] int getBins() const override { return m_length / 2; }
 

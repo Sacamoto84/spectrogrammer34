@@ -12,10 +12,18 @@ class ChunkerProcessor
     int m_destOffset = 0;
     int m_bufferIndex = 0;
 
+    /**
+     * Очередь, содержащая чанки аудио, которые нужно обработать.
+     */
     AudioQueue recQueue{QUEUE_SIZE};
+
+    /**
+     * Очередь, содержащая освобожденные чанки, готовые для повторного использования
+     */
     AudioQueue freeQueue{QUEUE_SIZE};
 
     bool PrepareBuffer(Processor *pSpectrum);
+
     AU_FORMAT *GetSampleData(sample_buf *b0)
     {
         return (AU_FORMAT *)b0->buf_;

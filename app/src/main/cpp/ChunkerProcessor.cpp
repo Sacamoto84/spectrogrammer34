@@ -14,6 +14,9 @@ void ChunkerProcessor::begin()
 
 }
 
+/**
+ * Завершает работу процессора, освобождая все чанки из recQueue и перемещая их в freeQueue.
+ */
 void ChunkerProcessor::end()
 {
     assert(m_started == true);
@@ -78,17 +81,19 @@ void ChunkerProcessor::Reset()
  */
 bool ChunkerProcessor::PrepareBuffer(Processor *pSpectrum)
 {
+    //Читаем какая длина данных m_length в процессоре 4096
     int dataToWrite = pSpectrum->getProcessedLength();
 
     if (m_bufferIndex==0)
     {
-        if (releaseUsedAudioChunks()==false)
+        if (!releaseUsedAudioChunks())
             return false;
 
         m_srcOffset = m_offset;
     }
 
     sample_buf *buf = nullptr;
+
     while(recQueue.peek(&buf, m_bufferIndex))
     {
         int bufSize = AU_LEN(buf->cap_);

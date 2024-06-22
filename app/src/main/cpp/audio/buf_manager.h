@@ -42,6 +42,11 @@ class ProducerConsumerQueue {
     assert(size < std::numeric_limits<int>::max());
   }
 
+  /**
+   * Добавляет элемент в очередь. Функция использует лямбда-выражение для записи элемента в буфер.
+   * @param item
+   * @return
+   */
   bool push(const T& item) {
     return push([&](T* ptr) -> bool {
       *ptr = item;
@@ -50,6 +55,10 @@ class ProducerConsumerQueue {
   }
 
   // get() is idempotent between calls to commit().
+  /**
+   * Возвращает указатель на запись без увеличения счетчика записи.
+   * @return
+   */
   T* getWriteablePtr() {
     T* result = nullptr;
 
@@ -106,6 +115,11 @@ class ProducerConsumerQueue {
     return result;
   }
   // front out the queue, but not pop-out
+  /**
+   * Функции для чтения элемента из начала очереди без его удаления
+   * @param out_item
+   * @return
+   */
   bool front(T* out_item) {
     return front([&](T* ptr) -> bool {
       *out_item = *ptr;
@@ -114,6 +128,12 @@ class ProducerConsumerQueue {
   }
 
     // front out the queue, but not pop-out
+    /**
+     * Чтение элемента по индексу, без его удаления
+     * @param out_item
+     * @param index
+     * @return
+     */
     bool peek(T* out_item, int index) {
       return peek([&](T* ptr) -> bool {
           *out_item = *ptr;
@@ -121,7 +141,10 @@ class ProducerConsumerQueue {
       }, index);
     }
 
-  void pop(void) {
+  /**
+   * Удаляет элемент из начала очереди, увеличивая указатель чтения.
+   */
+  void pop() {
     int readptr = read_.load(std::memory_order_relaxed);
     ++readptr;
     read_.store(readptr, std::memory_order_release);
@@ -159,7 +182,11 @@ class ProducerConsumerQueue {
       return result;
     }
 
-  uint32_t size(void) {
+  /**
+   * Возвращает количество элементов в очереди.
+   * @return
+   */
+  uint32_t size() {
     int writeptr = write_.load(std::memory_order_acquire);
     int readptr = read_.load(std::memory_order_relaxed);
 
@@ -180,12 +207,17 @@ class ProducerConsumerQueue {
 
 struct sample_buf {
   uint8_t* buf_;   // audio sample container
-  uint32_t cap_;   // buffer capacity in byte
+  uint32_t cap_;   // емкость буфера в байтах
   uint32_t size_;  // audio sample size (n buf) in byte
 };
 
 using AudioQueue = ProducerConsumerQueue<sample_buf*>;
 
+/**
+ * Освобождает память, выделенную для буферов.
+ * @param bufs
+ * @param count
+ */
 __inline__ void releaseSampleBufs(sample_buf* bufs, uint32_t& count) {
   if (!bufs || !count) {
     return;
@@ -195,6 +227,13 @@ __inline__ void releaseSampleBufs(sample_buf* bufs, uint32_t& count) {
   }
   delete[] bufs;
 }
+
+/**
+ * Выделяет память для заданного количества аудиобуферов и инициализирует их.
+ * @param count
+ * @param sizeInByte
+ * @return
+ */
 __inline__ sample_buf* allocateSampleBufs(uint32_t count, uint32_t sizeInByte) {
   if (count <= 0 || sizeInByte <= 0) {
     return nullptr;

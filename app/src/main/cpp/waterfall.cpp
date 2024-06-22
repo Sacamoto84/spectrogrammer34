@@ -19,6 +19,7 @@ inline uint16_t GetColor(float x) {
 
 void
 drawWaterFallLine(const AndroidBitmapInfo *info, int yy, void *pixels, BufferIODouble *pBuffer) {
+
     auto *line = (uint16_t * )((char *) pixels + info->stride * yy);
 
     /* optimize memory writes by generating one aligned 32-bit store
